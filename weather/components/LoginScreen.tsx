@@ -11,10 +11,10 @@ import { useState } from 'react';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type RootStackParamList = {
-  WeatherScreen: undefined;
+  Weather: undefined;
 };
 
-export default function AssetExample() {
+export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [nome, setNome] = useState<string>('');
@@ -26,7 +26,7 @@ export default function AssetExample() {
         Alert.alert('Sucesso', 'LOGADO MOFI');
         setNome('');
         setPass('');
-        navigation.navigate('WeatherScreen');
+        navigation.navigate('Weather');
       }
     } else {
       Alert.alert('Erro', 'Nome ou senha incorretos');
