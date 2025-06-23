@@ -8,6 +8,8 @@ import {
   Image,
 } from 'react-native';
 
+import { Feather } from '@expo/vector-icons';
+
 type WeatherData = {
   name: string;
   weather: { description: string; icon: string }[];
@@ -48,6 +50,9 @@ export default function WeatherScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity style={styles.menuButton}>
+          <Feather name="align-justify" size={24} color="black" />
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Pesquisar cidade"
@@ -77,14 +82,30 @@ export default function WeatherScreen() {
           <Text style={styles.description}>
             {weatherData.weather[0].description}
           </Text>
-          <Text style={styles.info}>
-            <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed} km/h
-          </Text>
-          <Text style={styles.info}>
-            <Text style={styles.label}>Umidade:</Text> {weatherData.main.humidity}%
-          </Text>
+          <View style={styles.additionalInfo}>
+            <Text style={styles.info}>
+              <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed} km/h</Text>
+            <Text style={styles.info}>
+              <Text style={styles.label}>Umidade:</Text> {weatherData.main.humidity}%
+            </Text>
+          </View>
         </View>
       )}
+
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton}>
+          <Feather name="home" size={24} color="black" />
+          <Text style={styles.footerButtonText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton}>
+          <Feather name="thermometer" size={24} color="black" />
+          <Text style={styles.footerButtonText}>Clima</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton}>
+          <Feather name="settings" size={24} color="black" />
+          <Text style={styles.footerButtonText}>Ajustes</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Error */}
       {error !== '' && <Text style={styles.errorText}>{error}</Text>}
@@ -95,26 +116,56 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#fff',
     alignItems: 'center',
     paddingTop: 60,
-    paddingHorizontal: 20,
   },
   header: {
     flexDirection: 'row',
     marginBottom: 30,
     alignItems: 'center',
     gap: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    justifyContent: 'space-around',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 70,
+    width: '100%',
+    backgroundColor: '#ccc',
+  },
+  footerButton: {
+    width: '30%',
+    height: 50,
+    borderRadius: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerButtonText: {
+    fontSize: 12,
+    color: 'black',
+    marginTop: 2,
+    fontWeight: 'bold',
   },
   input: {
     flex: 1,
-    backgroundColor: '#fff',
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 8,
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+  menuButton: {
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
   },
   searchButton: {
     backgroundColor: '#007AFF',
@@ -127,13 +178,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   weatherContainer: {
-    backgroundColor: '#fff',
     padding: 25,
     borderRadius: 20,
     alignItems: 'center',
     width: '100%',
-    elevation: 5,
-    shadowColor: '#000',
   },
   cityName: {
     fontSize: 24,
@@ -154,6 +202,11 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 10,
     textTransform: 'capitalize',
+  },
+  additionalInfo: {
+    marginTop: 20,
+    alignItems: 'flex-start',
+    width: '100%',
   },
   info: {
     fontSize: 16,
