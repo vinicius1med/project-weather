@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-
 import { Feather } from '@expo/vector-icons';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import Footer from './footer/Footer';
 
 type WeatherData = {
   name: string;
@@ -18,12 +19,20 @@ type WeatherData = {
   cod: number;
 };
 
+type RootStackParamList = {
+  History: undefined;
+  Details: undefined;
+  Calendar: undefined;
+  Settings: undefined;
+};
+
 const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
 
 export default function WeatherScreen() {
   const [city, setCity] = useState<string>('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string>('');
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -92,20 +101,7 @@ export default function WeatherScreen() {
         </View>
       )}
 
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton}>
-          <Feather name="home" size={24} color="black" />
-          <Text style={styles.footerButtonText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <Feather name="thermometer" size={24} color="black" />
-          <Text style={styles.footerButtonText}>Clima</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <Feather name="settings" size={24} color="black" />
-          <Text style={styles.footerButtonText}>Ajustes</Text>
-        </TouchableOpacity>
-      </View>
+      <Footer />
 
       {/* Error */}
       {error !== '' && <Text style={styles.errorText}>{error}</Text>}
@@ -141,7 +137,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   footerButton: {
-    width: '30%',
     height: 50,
     borderRadius: '100%',
     alignItems: 'center',
