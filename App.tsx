@@ -4,11 +4,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './components/LoginScreen';
 import HomeScreen from './components/HomeScreen';
 import WeatherScreen from './components/WeatherScreen';
+import DetailScreen from './components/DetailScreen';
+import HistoryScreen from './components/HistoryScreen';
+import SettingsScreen from './components/SettingsScreen';
+import CalendarScreen from './components/CalendarScreen';
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Weather: undefined;
+  History: undefined;
+  Details: undefined;
+  Calendar: undefined;
+  Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -21,6 +29,10 @@ export default function App() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Weather" component={WeatherScreen} />
       </Stack.Navigator>
