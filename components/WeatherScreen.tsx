@@ -21,9 +21,10 @@ type WeatherData = {
 
 type RootStackParamList = {
   History: undefined;
-  Details: undefined;
+  Details: { weatherData: any };
   Calendar: undefined;
   Settings: undefined;
+  MenuDrawer: undefined;
 };
 
 const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
@@ -59,7 +60,7 @@ export default function WeatherScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MenuDrawer')}>
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
         <TextInput
@@ -101,7 +102,7 @@ export default function WeatherScreen() {
         </View>
       )}
 
-      <Footer />
+      <Footer weatherData={weatherData} />
 
       {/* Error */}
       {error !== '' && <Text style={styles.errorText}>{error}</Text>}

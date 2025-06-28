@@ -5,19 +5,30 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type RootStackParamList = {
   History: undefined;
-  Details: undefined;
+  Details: { weatherData: any };
   Calendar: undefined;
   Settings: undefined;
 };
 
-export default function Footer() {
+type Props = {
+  weatherData?: any;
+};
+
+
+export default function Footer({ weatherData }: Props) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.footer}>
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={() => navigation.navigate('Details')}
+        onPress={() => {
+          if (weatherData) {
+            navigation.navigate('Details', { weatherData });
+          } else {
+            alert('Nenhuma previsão disponível!');
+          }}
+        }
       >
         <Feather name="thermometer" size={24} color="black" />
         <Text style={styles.footerButtonText}>+Detalhes</Text>
