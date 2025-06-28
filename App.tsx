@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -8,6 +10,7 @@ import DetailScreen from './components/DetailScreen';
 import HistoryScreen from './components/HistoryScreen';
 import SettingsScreen from './components/SettingsScreen';
 import CalendarScreen from './components/CalendarScreen';
+import MenuDrawer from './components/menu/MenuDrawer';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -17,6 +20,7 @@ export type RootStackParamList = {
   Details: undefined;
   Calendar: undefined;
   Settings: undefined;
+  MenuDrawer: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -35,6 +39,7 @@ export default function App() {
         <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Weather" component={WeatherScreen} />
+        <Stack.Screen name="MenuDrawer" component={MenuDrawer} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
