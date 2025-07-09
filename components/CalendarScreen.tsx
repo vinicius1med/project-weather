@@ -13,6 +13,11 @@ import { useDefaultStyles } from 'react-native-ui-datepicker';
 import { Feather } from '@expo/vector-icons';
 import Footer from './footer/Footer';
 import * as Location from 'expo-location';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+
+type RootStackParamList = {
+  Weather: undefined;
+};
 
 type WeatherData = {
   date: string; // YYYY-MM-DD
@@ -26,6 +31,7 @@ type WeatherData = {
 const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
 
 export default function CalendarScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [date, setDate] = useState<Dayjs>(dayjs());
   const defaultStyles = useDefaultStyles();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -181,7 +187,13 @@ export default function CalendarScreen() {
       </ScrollView>
 
       {/* FOOTER FIXO */}
-      <Footer />
+      <Footer
+        customButton={{
+          icon: <Feather name="cloud" size={24} color="black" />,
+          label: 'Clima',
+          onPress: () => navigation.navigate('Weather'),
+        }}
+      />
     </View>
   );
 }
@@ -192,7 +204,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingTop: 20,
-    paddingBottom: 80, // adiciona espaço para o Footer não cobrir conteúdo
   },
   header: {
     width: '100%',
@@ -220,7 +231,8 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   weatherContainer: {
-    padding: 25,
+    padding: 30,
+    paddingBottom: 180, // espaco extra p o footer n cobrir as infos
     borderRadius: 20,
     alignItems: 'center',
     width: '100%',

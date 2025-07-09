@@ -13,6 +13,7 @@ import Footer from './footer/Footer';
 type RootStackParamList = {
   MenuDrawer: undefined;
   Profile: undefined;
+  Weather: undefined;
 };
 
 const SettingsScreen = () => {
@@ -46,7 +47,13 @@ const SettingsScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Footer />
+      <Footer
+        customButton={{
+          icon: <Feather name="cloud" size={24} color="black" />,
+          label: 'Clima',
+          onPress: () => navigation.navigate('Weather'),
+        }}
+      />
     </View>
   );
 };

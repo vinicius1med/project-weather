@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
 import Footer from './footer/Footer';
 
 type WeatherData = {
@@ -60,7 +61,8 @@ export default function WeatherScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MenuDrawer')}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+>
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
         <TextInput
@@ -102,7 +104,7 @@ export default function WeatherScreen() {
         </View>
       )}
 
-      <Footer weatherData={weatherData} />
+      <Footer />
 
       {/* Error */}
       {error !== '' && <Text style={styles.errorText}>{error}</Text>}
