@@ -4,32 +4,33 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { useState } from 'react';
-
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StackParamList } from '../App';
 
-type RootStackParamList = {
-  MainDrawer: undefined;
-};
+type LoginScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Login'>;
 
 export default function LoginScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const [nome, setNome] = useState<string>('');
   const [pass, setPass] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
   function handleLoginPress() {
     if (nome !== '' && pass !== '') {
       if (nome.toLowerCase() === 'admin' && pass === 'admin') {
-        Alert.alert('Sucesso', 'LOGADO MOFI');
+        setMessage('LOGADO MOFI!');
         setNome('');
         setPass('');
-        navigation.navigate('MainDrawer');
+        navigation.navigate('Weather');
+      } else {
+        setMessage('Nome ou senha incorretos.');
       }
     } else {
-      Alert.alert('Erro', 'Nome ou senha incorretos');
+      setMessage('Por favor, preencha nome e senha.');
     }
   }
 
@@ -61,8 +62,7 @@ export default function LoginScreen() {
           />
         </View>
 
-        <Text>{nome}</Text>
-        <Text>{pass}</Text>
+        {message !== '' && <Text style={styles.messageText}>{message}</Text>}
 
         <TouchableOpacity
           style={styles.appButtonContainer}
@@ -82,12 +82,10 @@ const styles = StyleSheet.create({
     padding: 24,
     borderRadius: 16,
     margin: 16,
-
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-
     elevation: 4,
   },
   screen: {
@@ -140,5 +138,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'center',
     textTransform: 'uppercase',
+  },
+  messageText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });

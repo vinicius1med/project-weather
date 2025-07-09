@@ -7,24 +7,33 @@ import {
   Switch,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import Footer from './footer/Footer';
+import { StackParamList, DrawerParamList } from '../App';
 
-type RootStackParamList = {
-  MenuDrawer: undefined;
-  Profile: undefined;
-  Weather: undefined;
-};
+type SettingsScreenNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'MainStack'>,
+  NativeStackNavigationProp<StackParamList, 'Settings'>
+>;
 
 const SettingsScreen = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
   const [darkMode, setDarkMode] = useState(false);
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MenuDrawer')}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+        >
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Ajustes</Text>
@@ -69,6 +78,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   header: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -76,7 +86,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-    width: '100%',
   },
   menuButton: {
     padding: 10,
