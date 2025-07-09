@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type RootStackParamList = {
-  Weather: undefined;
+  MainDrawer: undefined;
 };
 
 export default function LoginScreen() {
@@ -26,7 +26,7 @@ export default function LoginScreen() {
         Alert.alert('Sucesso', 'LOGADO MOFI');
         setNome('');
         setPass('');
-        navigation.navigate('Weather');
+        navigation.navigate('MainDrawer');
       }
     } else {
       Alert.alert('Erro', 'Nome ou senha incorretos');

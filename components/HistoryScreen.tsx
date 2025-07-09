@@ -14,6 +14,7 @@ type RootStackParamList = {
   MenuDrawer: undefined;
   Details: undefined;
   Profile: undefined;
+  Weather: undefined;
 };
 
 export default function HistoryScreen () {
@@ -42,7 +43,13 @@ export default function HistoryScreen () {
         )}
       />
 
-      <Footer />
+      <Footer
+        customButton={{
+          icon: <Feather name="cloud" size={24} color="black" />,
+          label: 'Clima',
+          onPress: () => navigation.navigate('Weather'),
+        }}
+      />
     </View>
   );
 };

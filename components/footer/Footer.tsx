@@ -5,33 +5,42 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type RootStackParamList = {
   History: undefined;
-  Details: { weatherData: any };
+  Details: undefined;
   Calendar: undefined;
   Settings: undefined;
 };
 
-type Props = {
-  weatherData?: any;
+type FooterButton = {
+  icon: React.ReactNode;
+  label: string;
+  onPress: () => void;
+};
+
+type FooterProps = {
+  customButton?: FooterButton;
 };
 
 
-export default function Footer({ weatherData }: Props) {
+export default function Footer({ customButton }: FooterProps) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.footer}>
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={() => {
-          if (weatherData) {
-            navigation.navigate('Details', { weatherData });
-          } else {
-            alert('Nenhuma previsão disponível!');
-          }}
-        }
+        onPress={customButton? customButton.onPress : () => navigation.navigate('Details')}
       >
-        <Feather name="thermometer" size={24} color="black" />
-        <Text style={styles.footerButtonText}>+Detalhes</Text>
+        {customButton ? (
+          <>
+            {customButton.icon}
+            <Text style={styles.footerButtonText}>{customButton.label}</Text>
+          </>
+        ) : (
+          <>
+            <Feather name="thermometer" size={24} color="black" />
+            <Text style={styles.footerButtonText}>+Detalhes</Text>
+          </>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -68,9 +77,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 70,
+    height: 120,
     width: '100%',
     backgroundColor: '#ccc',
+    paddingBottom: 50,
   },
   footerButton: {
     height: 50,
