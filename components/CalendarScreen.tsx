@@ -14,6 +14,7 @@ import { Feather } from '@expo/vector-icons';
 import Footer from './footer/Footer';
 import * as Location from 'expo-location';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
 
 type RootStackParamList = {
   Weather: undefined;
@@ -118,16 +119,20 @@ export default function CalendarScreen() {
   const maxDate = dayjs().add(5, 'day');
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {/* HEADER FIXO */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+        >
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
+        <Text style={styles.title}>Calendário</Text>
       </View>
 
       {/* CONTEÚDO ROLÁVEL */}
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <DatePicker
           mode="single"
           date={date}
@@ -148,16 +153,22 @@ export default function CalendarScreen() {
         />
 
         {errorGetLocation && (
-          <Text style={{ color: 'red', marginTop: 10 }}>{errorGetLocation}</Text>
+          <Text style={{ color: 'red', marginTop: 10 }}>
+            {errorGetLocation}
+          </Text>
         )}
 
         {errorFetchWeather && (
-          <Text style={{ color: 'red', marginTop: 10 }}>{errorFetchWeather}</Text>
+          <Text style={{ color: 'red', marginTop: 10 }}>
+            {errorFetchWeather}
+          </Text>
         )}
 
         {weatherForSelectedDay ? (
           <View style={styles.weatherContainer}>
-            <Text style={styles.cityName}>{`Previsão para ${date.format('DD/MM/YYYY')}`}</Text>
+            <Text style={styles.cityName}>{`Previsão para ${date.format(
+              'DD/MM/YYYY',
+            )}`}</Text>
             <Image
               style={styles.weatherIcon}
               source={{
@@ -172,10 +183,12 @@ export default function CalendarScreen() {
             </Text>
             <View style={styles.additionalInfo}>
               <Text style={styles.info}>
-                <Text style={styles.label}>Vento:</Text> {weatherForSelectedDay.windSpeed} km/h
+                <Text style={styles.label}>Vento:</Text>{' '}
+                {weatherForSelectedDay.windSpeed} km/h
               </Text>
               <Text style={styles.info}>
-                <Text style={styles.label}>Umidade:</Text> {weatherForSelectedDay.humidity}%
+                <Text style={styles.label}>Umidade:</Text>{' '}
+                {weatherForSelectedDay.humidity}%
               </Text>
             </View>
           </View>
@@ -200,20 +213,29 @@ export default function CalendarScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    paddingTop: 60,
+    backgroundColor: '#fff',
+  },
+  scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingTop: 20,
   },
   header: {
-    width: '100%',
+    width: '100%',  
     flexDirection: 'row',
-    marginBottom: 10,
     alignItems: 'center',
+    gap: 10,
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   menuButton: {
     padding: 10,

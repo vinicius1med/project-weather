@@ -14,7 +14,13 @@ import CalendarScreen from './components/CalendarScreen';
 import ProfileScreen from './components/ProfileScreen';
 import AboutScreen from './components/AboutScreen';
 
-export type RootStackParamList = {
+export type DrawerParamList = {
+  MainStack: undefined;
+  Profile: undefined;
+  About: undefined;
+};
+
+export type StackParamList = {
   Home: undefined;
   Login: undefined;
   Weather: undefined;
@@ -22,42 +28,45 @@ export type RootStackParamList = {
   Details: undefined;
   Calendar: undefined;
   Settings: undefined;
-  MainDrawer: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<StackParamList>();
+const Drawer = createDrawerNavigator<DrawerParamList>();
+
+function MainStackNavigator() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailScreen} />
+      <Stack.Screen name="Weather" component={WeatherScreen} />
+      <Stack.Screen name="History" component={HistoryScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Calendar" component={CalendarScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function RootDrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      initialRouteName="MainStack"
+      screenOptions={{ headerShown: false }}
+    >
+      <Drawer.Screen name="MainStack" component={MainStackNavigator} options={{title: 'Menu'}}/>
+      <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="About" component={AboutScreen} />
+    </Drawer.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Home"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailScreen} />
-        <Stack.Screen name="Weather" component={WeatherScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="Calendar" component={CalendarScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="MainDrawer" component={MainDrawer} options={{ headerShown: false }} />
-      </Stack.Navigator>
+      <RootDrawerNavigator />
     </NavigationContainer>
-  );
-}
-
-const Drawer = createDrawerNavigator();
-
-function MainDrawer() {
-  return (
-    <Drawer.Navigator initialRouteName="Weather" screenOptions={{ headerShown: false }}>
-      <Drawer.Screen name="Weather" component={WeatherScreen} />
-      <Drawer.Screen name="Profile" component={ProfileScreen} />
-      <Drawer.Screen name="Details" component={DetailScreen} />
-      <Drawer.Screen name="History" component={HistoryScreen} />
-      <Drawer.Screen name="About" component={AboutScreen} />
-      <Drawer.Screen name="Calendar" component={CalendarScreen} />
-    </Drawer.Navigator>
   );
 }

@@ -1,23 +1,20 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { StackParamList, DrawerParamList } from '../App';
 
-type RootStackParamList = {
-  Home: undefined;
-  Login: undefined;
-};
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Home'
+type HomeScreenNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'MainStack'>,
+  NativeStackNavigationProp<StackParamList, 'Home'>
 >;
 
-type Props = {
-  navigation: HomeScreenNavigationProp;
-  route: RouteProp<RootStackParamList, 'Home'>;
-};
+export default function HomeScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
-export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to my App!</Text>

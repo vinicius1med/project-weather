@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
 import Footer from './footer/Footer';
 
 type RootStackParamList = {
@@ -17,17 +18,18 @@ type RootStackParamList = {
   Weather: undefined;
 };
 
-export default function HistoryScreen () {
+export default function HistoryScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  // Simulação de histórico de cidades buscadas
   const history = ['São Paulo', 'Rio de Janeiro', 'Salvador', 'Fortaleza'];
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MenuDrawer')}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+        >
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Histórico</Text>
@@ -52,9 +54,7 @@ export default function HistoryScreen () {
       />
     </View>
   );
-};
-
-
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   header: {
+    width: '100%',  
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -72,8 +73,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-    marginBottom: 20,
-    width: '100%',
   },
   menuButton: {
     padding: 10,

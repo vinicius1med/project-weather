@@ -8,9 +8,32 @@ import {
   Image,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import Footer from './footer/Footer';
+
+import { StackParamList, DrawerParamList } from '../App';
+
+// --------------- weather data more details type definition ---------------
+// type WeatherData = {
+//     name: string;
+//     weather: { description: string; icon: string }[];
+//     main: { temp: number; humidity: number; pressure: number };
+//     wind: { speed: number };
+//     cod: number;
+//     sys: { country: string; sunrise: number; sunset: number };
+//     coord: { lon: number; lat: number };
+//     base: string;
+//     visibility: number;
+//     dt: number;
+//     timezone: number;
+//     id: number;
+// };
 
 type WeatherData = {
   name: string;
@@ -20,13 +43,10 @@ type WeatherData = {
   cod: number;
 };
 
-type RootStackParamList = {
-  History: undefined;
-  Details: { weatherData: any };
-  Calendar: undefined;
-  Settings: undefined;
-  MenuDrawer: undefined;
-};
+type WeatherScreenNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'MainStack'>,
+  NativeStackNavigationProp<StackParamList, 'Weather'>
+>;
 
 const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
 
@@ -34,7 +54,7 @@ export default function WeatherScreen() {
   const [city, setCity] = useState<string>('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string>('');
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<WeatherScreenNavigationProp>();
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -61,8 +81,10 @@ export default function WeatherScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
->
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+        >
           <Feather name="align-justify" size={24} color="black" />
         </TouchableOpacity>
         <TextInput
@@ -141,7 +163,7 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     height: 50,
-    borderRadius: '100%',
+    borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
