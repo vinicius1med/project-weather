@@ -1,21 +1,13 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Switch,
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import {
-  useNavigation,
-  CompositeNavigationProp,
-} from '@react-navigation/native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import Footer from './footer/Footer';
 import { StackParamList, DrawerParamList } from '../App';
+import Footer from './footer/Footer';
+import { useTheme } from '../components/context/ThemeContext';
 
 type SettingsScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
@@ -24,7 +16,8 @@ type SettingsScreenNavigationProp = CompositeNavigationProp<
 
 const SettingsScreen = () => {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
-  const [darkMode, setDarkMode] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
     <View style={styles.container}>
@@ -41,19 +34,12 @@ const SettingsScreen = () => {
 
       <View style={styles.content}>
         <View style={styles.settingRow}>
-          <Text style={styles.settingText}>Modo Noturno</Text>
+          <Text style={styles.settingText}>Tema Escuro</Text>
           <Switch
-            value={darkMode}
-            onValueChange={(value) => setDarkMode(value)}
+            value={isDark}
+            onValueChange={toggleTheme}
           />
         </View>
-
-        <TouchableOpacity
-          style={styles.profileButton}
-          onPress={() => navigation.navigate('Profile')}
-        >
-          <Text style={styles.profileButtonText}>Ir para Perfil</Text>
-        </TouchableOpacity>
       </View>
 
       <Footer
@@ -106,16 +92,5 @@ const styles = StyleSheet.create({
   },
   settingText: {
     fontSize: 18,
-  },
-  profileButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  profileButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });

@@ -1,25 +1,20 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList,} from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
 import Footer from './footer/Footer';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { StackParamList, DrawerParamList } from '../App';  
 
-type RootStackParamList = {
-  MenuDrawer: undefined;
-  Details: undefined;
-  Profile: undefined;
-  Weather: undefined;
-};
+type SettingsScreenNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'MainStack'>,
+  NativeStackNavigationProp<StackParamList, 'Details'>
+>;
 
 export default function HistoryScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
   const history = ['São Paulo', 'Rio de Janeiro', 'Salvador', 'Fortaleza'];
 
   return (

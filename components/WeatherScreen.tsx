@@ -1,47 +1,14 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import {
-  useNavigation,
-  CompositeNavigationProp,
-} from '@react-navigation/native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import Footer from './footer/Footer';
-
 import { StackParamList, DrawerParamList } from '../App';
-
-// --------------- weather data more details type definition ---------------
-// type WeatherData = {
-//     name: string;
-//     weather: { description: string; icon: string }[];
-//     main: { temp: number; humidity: number; pressure: number };
-//     wind: { speed: number };
-//     cod: number;
-//     sys: { country: string; sunrise: number; sunset: number };
-//     coord: { lon: number; lat: number };
-//     base: string;
-//     visibility: number;
-//     dt: number;
-//     timezone: number;
-//     id: number;
-// };
-
-type WeatherData = {
-  name: string;
-  weather: { description: string; icon: string }[];
-  main: { temp: number; humidity: number };
-  wind: { speed: number };
-  cod: number;
-};
+import { WeatherData } from '../App';
+import { useTheme } from '../components/context/ThemeContext';
 
 type WeatherScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
@@ -55,6 +22,8 @@ export default function WeatherScreen() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string>('');
   const navigation = useNavigation<WeatherScreenNavigationProp>();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -78,7 +47,7 @@ export default function WeatherScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}> 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -118,15 +87,30 @@ export default function WeatherScreen() {
           </Text>
           <View style={styles.additionalInfo}>
             <Text style={styles.info}>
-              <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed} km/h</Text>
+              <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed}{' '}
+              km/h
+            </Text>
             <Text style={styles.info}>
-              <Text style={styles.label}>Umidade:</Text> {weatherData.main.humidity}%
+              <Text style={styles.label}>Umidade:</Text>{' '}
+              {weatherData.main.humidity}%
             </Text>
           </View>
         </View>
       )}
 
-      <Footer />
+      <Footer
+        customButton={{
+          icon: <Feather name="thermometer" size={24} color="black" />,
+          label: '+Detalhes',
+          onPress: () => {
+            if (weatherData) {
+              navigation.navigate('Details', { weatherData });
+            } else {
+              alert('Nenhum dado de clima carregado.');
+            }
+          },
+        }}
+      />
 
       {/* Error */}
       {error !== '' && <Text style={styles.errorText}>{error}</Text>}
@@ -137,7 +121,6 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     paddingTop: 60,
   },

@@ -1,26 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import {
-  useNavigation,
-  CompositeNavigationProp,
-} from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { StackParamList, DrawerParamList } from '../App';
-
-type HomeScreenNavigationProp = CompositeNavigationProp<
-  DrawerNavigationProp<DrawerParamList, 'MainStack'>,
-  NativeStackNavigationProp<StackParamList, 'Home'>
->;
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { StackParamList } from '../App';
 
 export default function HomeScreen() {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const navigation = useNavigation<NavigationProp<StackParamList>>();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to my App!</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.replace('Login')}
+        onPress={() => navigation.navigate('Login')}
       >
         <Text style={styles.buttonText}>Open app</Text>
       </TouchableOpacity>
