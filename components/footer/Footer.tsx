@@ -28,7 +28,7 @@ export default function Footer({ customButton }: FooterProps) {
     <View style={styles.footer}>
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={customButton? customButton.onPress : () => navigation.navigate('Details')}
+        onPress={customButton? customButton.onPress : () => alert('Sem funcao definida neste botao')}
       >
         {customButton ? (
           <>

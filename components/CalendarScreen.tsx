@@ -21,6 +21,7 @@ type RootStackParamList = {
 };
 
 type WeatherData = {
+  name: string;
   date: string; // YYYY-MM-DD
   temp: number;
   description: string;
@@ -104,6 +105,7 @@ export default function CalendarScreen() {
     const noonForecast = forecastsOfDay.find(item => item.dt_txt.includes('12:00:00')) || forecastsOfDay[0];
 
     const simplified: WeatherData = {
+      name: noonForecast.name,
       date: selectedDateStr,
       temp: noonForecast.main.temp,
       description: noonForecast.weather[0].description,
@@ -166,6 +168,7 @@ export default function CalendarScreen() {
 
         {weatherForSelectedDay ? (
           <View style={styles.weatherContainer}>
+            <Text style={styles.cityName}>{weatherForSelectedDay.name}</Text>
             <Text style={styles.cityName}>{`Previsão para ${date.format(
               'DD/MM/YYYY',
             )}`}</Text>

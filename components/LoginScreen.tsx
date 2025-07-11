@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useState } from 'react';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../App';
 
@@ -14,7 +14,6 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Logi
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginScreenNavigationProp>();
-
   const [nome, setNome] = useState<string>('');
   const [pass, setPass] = useState<string>('');
   const [message, setMessage] = useState<string>('');
@@ -22,7 +21,6 @@ export default function LoginScreen() {
   function handleLoginPress() {
     if (nome !== '' && pass !== '') {
       if (nome.toLowerCase() === 'admin' && pass === 'admin') {
-        setMessage('LOGADO MOFI!');
         setNome('');
         setPass('');
         navigation.navigate('Weather');

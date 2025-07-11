@@ -1,9 +1,7 @@
 import 'react-native-gesture-handler';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-
 import LoginScreen from './components/LoginScreen';
 import HomeScreen from './components/HomeScreen';
 import WeatherScreen from './components/WeatherScreen';
@@ -13,6 +11,17 @@ import SettingsScreen from './components/SettingsScreen';
 import CalendarScreen from './components/CalendarScreen';
 import ProfileScreen from './components/ProfileScreen';
 import AboutScreen from './components/AboutScreen';
+import { ThemeProvider } from './components/context/ThemeContext';
+
+export type WeatherData = {
+    name: string;
+    weather: { description: string; icon: string }[];
+    main: { temp: number; humidity: number; pressure: number };
+    wind: { speed: number };
+    cod: number;
+    sys: { country: string; sunrise: number; sunset: number };
+    coord: { lon: number; lat: number };
+};
 
 export type DrawerParamList = {
   MainStack: undefined;
@@ -25,7 +34,7 @@ export type StackParamList = {
   Login: undefined;
   Weather: undefined;
   History: undefined;
-  Details: undefined;
+  Details: { weatherData: WeatherData };
   Calendar: undefined;
   Settings: undefined;
 };
@@ -65,8 +74,10 @@ function RootDrawerNavigator() {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <RootDrawerNavigator />
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <RootDrawerNavigator />
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
