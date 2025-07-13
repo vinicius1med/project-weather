@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../context/ThemeContext';
+import { darkColors, lightColors } from '../ui/colors';
 
 type RootStackParamList = {
   History: undefined;
@@ -20,25 +23,48 @@ type FooterProps = {
   customButton?: FooterButton;
 };
 
-
 export default function Footer({ customButton }: FooterProps) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const backgroundColor = isDark ? darkColors.background : lightColors.background;
+  const iconColor = isDark ? darkColors.primaryText : lightColors.primaryText;
 
   return (
-    <View style={styles.footer}>
+    <View
+      style={[
+        styles.footer,
+        {
+          paddingBottom: insets.bottom || 10,
+          backgroundColor: backgroundColor,
+          borderTopWidth: 1,
+          borderTopColor: isDark ? darkColors.borders : lightColors.borders,
+        },
+      ]}
+    >
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={customButton? customButton.onPress : () => alert('Sem funcao definida neste botao')}
+        onPress={
+          customButton
+            ? customButton.onPress
+            : () => alert('Sem função definida neste botão')
+        }
       >
         {customButton ? (
           <>
             {customButton.icon}
-            <Text style={styles.footerButtonText}>{customButton.label}</Text>
+            <Text style={[styles.footerButtonText, { color: iconColor }]}>
+              {customButton.label}
+            </Text>
           </>
         ) : (
           <>
-            <Feather name="thermometer" size={24} color="black" />
-            <Text style={styles.footerButtonText}>+Detalhes</Text>
+            <Feather name="thermometer" size={24} color={iconColor} />
+            <Text style={[styles.footerButtonText, { color: iconColor }]}>
+              +Detalhes
+            </Text>
           </>
         )}
       </TouchableOpacity>
@@ -47,24 +73,24 @@ export default function Footer({ customButton }: FooterProps) {
         style={styles.footerButton}
         onPress={() => navigation.navigate('History')}
       >
-        <Feather name="clock" size={24} color="black" />
-        <Text style={styles.footerButtonText}>Histórico</Text>
+        <Feather name="clock" size={24} color={iconColor} />
+        <Text style={[styles.footerButtonText, { color: iconColor }]}>Histórico</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.footerButton}
         onPress={() => navigation.navigate('Calendar')}
       >
-        <Feather name="calendar" size={24} color="black" />
-        <Text style={styles.footerButtonText}>Calendário</Text>
+        <Feather name="calendar" size={24} color={iconColor} />
+        <Text style={[styles.footerButtonText, { color: iconColor }]}>Calendário</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.footerButton}
         onPress={() => navigation.navigate('Settings')}
       >
-        <Feather name="settings" size={24} color="black" />
-        <Text style={styles.footerButtonText}>Ajustes</Text>
+        <Feather name="settings" size={24} color={iconColor} />
+        <Text style={[styles.footerButtonText, { color: iconColor }]}>Ajustes</Text>
       </TouchableOpacity>
     </View>
   );
@@ -77,10 +103,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 120,
     width: '100%',
-    backgroundColor: '#ccc',
-    paddingBottom: 50,
+    paddingTop: 10,
   },
   footerButton: {
     height: 50,
@@ -89,7 +113,6 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
     fontSize: 12,
-    color: 'black',
     marginTop: 2,
     fontWeight: 'bold',
   },

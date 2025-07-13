@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "^7.5.0",
     "@react-navigation/drawer": "^7.5.2",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
+    "axios": "^1.10.0",
     "dayjs": "^1.11.13",
     "expo": "~53.0.12",
     "expo-location": "~18.1.5",

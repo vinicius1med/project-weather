@@ -15,6 +15,8 @@ import Footer from './footer/Footer';
 import * as Location from 'expo-location';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
+import { useTheme } from '../components/context/ThemeContext';
+import { darkColors, lightColors } from '../components/ui/colors';
 
 type RootStackParamList = {
   Weather: undefined;
@@ -41,6 +43,8 @@ export default function CalendarScreen() {
   const [errorFetchWeather, setErrorFetchWeather] = useState<string>('');
   const [forecastData, setForecastData] = useState<any[]>([]);
   const [weatherForSelectedDay, setWeatherForSelectedDay] = useState<WeatherData | null>(null);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -121,20 +125,20 @@ export default function CalendarScreen() {
   const maxDate = dayjs().add(5, 'day');
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? darkColors.background : lightColors.background }]}>
       {/* HEADER FIXO */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: isDark ? darkColors.borders : lightColors.borders }]}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         >
-          <Feather name="align-justify" size={24} color="black" />
+          <Feather name="align-justify" size={24} color={isDark ? darkColors.primaryText : lightColors.primaryText} />
         </TouchableOpacity>
-        <Text style={styles.title}>Calendário</Text>
+        <Text style={[styles.title, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>Calendário</Text>
       </View>
 
       {/* CONTEÚDO ROLÁVEL */}
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: isDark ? darkColors.background : lightColors.background }]}>
         <DatePicker
           mode="single"
           date={date}
@@ -143,14 +147,17 @@ export default function CalendarScreen() {
               setDate(dayjs(date));
             }
           }}
-          style={styles.datePickerContainer}
+          style={[styles.datePickerContainer, { shadowColor: isDark ? darkColors.primaryText : lightColors.primaryText }, { backgroundColor: isDark ? "#bfbfbf" : lightColors.primaryText }]}
           minDate={minDate.toDate()}
           maxDate={maxDate.toDate()}
           styles={{
             ...defaultStyles,
-            today: { borderColor: 'blue', borderWidth: 1 },
-            selected: { backgroundColor: 'blue' },
-            selected_label: { color: 'white' },
+            selected: isDark
+              ? { backgroundColor: darkColors.buttons }
+              : { backgroundColor: lightColors.buttons },
+            selected_label: isDark
+              ? { color: 'white' }
+              : defaultStyles.selected_label,
           }}
         />
 
@@ -168,8 +175,8 @@ export default function CalendarScreen() {
 
         {weatherForSelectedDay ? (
           <View style={styles.weatherContainer}>
-            <Text style={styles.cityName}>{weatherForSelectedDay.name}</Text>
-            <Text style={styles.cityName}>{`Previsão para ${date.format(
+            <Text style={[styles.cityName, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>{weatherForSelectedDay.name}</Text>
+            <Text style={[styles.cityName, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>{`Previsão para ${date.format(
               'DD/MM/YYYY',
             )}`}</Text>
             <Image
@@ -178,25 +185,25 @@ export default function CalendarScreen() {
                 uri: `https://openweathermap.org/img/wn/${weatherForSelectedDay.icon}@2x.png`,
               }}
             />
-            <Text style={styles.temperature}>
+            <Text style={[styles.temperature, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>
               {Math.round(weatherForSelectedDay.temp)}°
             </Text>
-            <Text style={styles.description}>
+            <Text style={[styles.description, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>
               {weatherForSelectedDay.description}
             </Text>
             <View style={styles.additionalInfo}>
-              <Text style={styles.info}>
+              <Text style={[styles.info, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>
                 <Text style={styles.label}>Vento:</Text>{' '}
                 {weatherForSelectedDay.windSpeed} km/h
               </Text>
-              <Text style={styles.info}>
+              <Text style={[styles.info, { color: isDark ? darkColors.primaryText : lightColors.primaryText }]}>
                 <Text style={styles.label}>Umidade:</Text>{' '}
                 {weatherForSelectedDay.humidity}%
               </Text>
             </View>
           </View>
         ) : (
-          <Text style={{ marginTop: 20 }}>
+          <Text style={{ marginTop: 20, color: isDark ? darkColors.primaryText : lightColors.primaryText }}>
             Previsão indisponível para essa data.
           </Text>
         )}
@@ -205,7 +212,13 @@ export default function CalendarScreen() {
       {/* FOOTER FIXO */}
       <Footer
         customButton={{
-          icon: <Feather name="cloud" size={24} color="black" />,
+          icon: (
+            <Feather
+              name="cloud"
+              size={24}
+              color={isDark ? darkColors.primaryText : lightColors.primaryText}
+            />
+          ),
           label: 'Clima',
           onPress: () => navigation.navigate('Weather'),
         }}
@@ -218,11 +231,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 60,
-    backgroundColor: '#fff',
+    // backgroundColor removed to apply dynamically
   },
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    // backgroundColor removed to apply dynamically
     alignItems: 'center',
     paddingTop: 20,
   },
@@ -234,11 +247,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    // borderColor removed to apply dynamically
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    // color removed to apply dynamically
   },
   menuButton: {
     padding: 10,
@@ -248,8 +262,6 @@ const styles = StyleSheet.create({
   datePickerContainer: {
     width: 320,
     borderRadius: 12,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -257,7 +269,7 @@ const styles = StyleSheet.create({
   },
   weatherContainer: {
     padding: 30,
-    paddingBottom: 180, // espaco extra p o footer n cobrir as infos
+    paddingBottom: 180, // espaço extra para o footer não cobrir as infos
     borderRadius: 20,
     alignItems: 'center',
     width: '100%',
@@ -266,6 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    // color removed to apply dynamically
   },
   weatherIcon: {
     width: 100,
@@ -274,11 +287,11 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
+    // color removed to apply dynamically
   },
   description: {
     fontSize: 18,
-    color: '#666',
+    // color removed to apply dynamically
     marginBottom: 10,
     textTransform: 'capitalize',
   },
@@ -289,7 +302,7 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 16,
-    color: '#333',
+    // color removed to apply dynamically
   },
   label: {
     fontWeight: 'bold',

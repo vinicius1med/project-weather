@@ -10,25 +10,24 @@ import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../App';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-type LoginScreenNavigationProp = NativeStackNavigationProp<
+type RegisterScreenNavigationProp = NativeStackNavigationProp<
   StackParamList,
-  'Login'
+  'Register'
 >;
 
-export default function LoginScreen() {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+export default function RegisterScreen() {
+  const navigation = useNavigation<RegisterScreenNavigationProp>();
   const [nome, setNome] = useState<string>('');
   const [pass, setPass] = useState<string>('');
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
 
-  async function handleLoginPress() {
+  async function handleRegisterPress() {
     if (nome !== '' && pass !== '') {
       try {
         const response = await axios.post(
-          'https://weatheruser-production.up.railway.app/users/login',
+          'https://weatheruser-production.up.railway.app/users',
           {
             name: nome,
             password: pass,
@@ -38,30 +37,36 @@ export default function LoginScreen() {
         if (response.status === 200) {
           setNome('');
           setPass('');
-          setMessage('');
-          navigation.navigate('Weather');
-          await AsyncStorage.setItem('userId', String(response.data.id));
-          await AsyncStorage.setItem('userName', response.data.name);
+          setMessage('Cadastro realizado com sucesso!');
+          setTimeout(() => {
+            navigation.navigate('Login');
+          }, 1500);
+          setIsSuccess(true);
         } else {
-          setMessage('Nome ou senha incorretos.');
+          setMessage('Erro ao cadastrar usuário.');
+          setIsSuccess(false);
         }
       } catch (error: any) {
-        if (error.response && error.response.status === 401) {
-          setMessage('Nome ou senha incorretos.');
+        if (error.response && error.response.status === 409) {
+          // Supondo que sua API retorne 409 se usuário já existir
+          setMessage('Usuário já existe.');
+          setIsSuccess(false);
         } else {
           setMessage('Erro ao conectar à API.');
           console.error(error);
+          setIsSuccess(false);
         }
       }
     } else {
       setMessage('Por favor, preencha nome e senha.');
+      setIsSuccess(false);
     }
   }
 
   return (
     <View style={styles.screen}>
       <View style={styles.container}>
-        <Text style={styles.top}>Login</Text>
+        <Text style={styles.top}>Cadastro</Text>
 
         <View style={styles.box}>
           <Text style={styles.label}>Nome</Text>
@@ -86,21 +91,29 @@ export default function LoginScreen() {
           />
         </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Register')}
-          style={styles.linkContainer}
+        <Text
+          style={[styles.messageText, { color: isSuccess ? 'green' : 'red' }]}
         >
-          <Text style={styles.linkText}>Criar conta</Text>
-        </TouchableOpacity>
-
-        {message !== '' && <Text style={styles.messageText}>{message}</Text>}
+          {message}
+        </Text>
 
         <TouchableOpacity
           style={styles.appButtonContainer}
           activeOpacity={0.8}
-          onPress={handleLoginPress}
+          onPress={handleRegisterPress}
         >
-          <Text style={styles.appButtonText}>Entrar</Text>
+          <Text style={styles.appButtonText}>Registrar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.appButtonContainer,
+            { marginTop: 10, backgroundColor: '#555' },
+          ]}
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.appButtonText}>Voltar para Login</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -171,17 +184,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   messageText: {
-    color: 'red',
     textAlign: 'center',
     marginBottom: 10,
-  },
-  linkContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 12,
-  },
-  linkText: {
-    color: '#555',
-    fontSize: 14,
-    textDecorationLine: 'underline',
   },
 });

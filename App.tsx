@@ -1,8 +1,9 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import LoginScreen from './components/LoginScreen';
+import RegisterScreen from './components/RegisterScreen';
 import HomeScreen from './components/HomeScreen';
 import WeatherScreen from './components/WeatherScreen';
 import DetailScreen from './components/DetailScreen';
@@ -11,16 +12,18 @@ import SettingsScreen from './components/SettingsScreen';
 import CalendarScreen from './components/CalendarScreen';
 import ProfileScreen from './components/ProfileScreen';
 import AboutScreen from './components/AboutScreen';
-import { ThemeProvider } from './components/context/ThemeContext';
+import { ThemeProvider, useTheme } from './components/context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { darkColors, lightColors } from './components/ui/colors';
 
 export type WeatherData = {
-    name: string;
-    weather: { description: string; icon: string }[];
-    main: { temp: number; humidity: number; pressure: number };
-    wind: { speed: number };
-    cod: number;
-    sys: { country: string; sunrise: number; sunset: number };
-    coord: { lon: number; lat: number };
+  name: string;
+  weather: { description: string; icon: string }[];
+  main: { temp: number; humidity: number; pressure: number };
+  wind: { speed: number };
+  cod: number;
+  sys: { country: string; sunrise: number; sunset: number };
+  coord: { lon: number; lat: number };
 };
 
 export type DrawerParamList = {
@@ -32,6 +35,7 @@ export type DrawerParamList = {
 export type StackParamList = {
   Home: undefined;
   Login: undefined;
+  Register: undefined;
   Weather: undefined;
   History: undefined;
   Details: { weatherData: WeatherData };
@@ -55,17 +59,52 @@ function MainStackNavigator() {
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Calendar" component={CalendarScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
     </Stack.Navigator>
   );
 }
 
+function CustomDrawerContent(props: any) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  return (
+    <DrawerContentScrollView
+      {...props}
+      style={{ backgroundColor: isDark ? darkColors.background : lightColors.background }}
+      contentContainerStyle={{ flex: 1 }}
+    >
+      <DrawerItemList {...props} 
+        labelStyle={{ color: isDark ? darkColors.primaryText : lightColors.primaryText }}
+        activeTintColor={isDark ? darkColors.buttons : lightColors.buttons}
+        inactiveTintColor={isDark ? darkColors.primaryText : lightColors.primaryText}
+      />
+      {/* Você pode adicionar itens customizados aqui, se quiser */}
+    </DrawerContentScrollView>
+  );
+}
+
 function RootDrawerNavigator() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <Drawer.Navigator
       initialRouteName="MainStack"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: isDark ? darkColors.background : lightColors.background,
+        },
+        drawerActiveTintColor: isDark ? darkColors.buttons : lightColors.buttons,
+        drawerInactiveTintColor: isDark ? darkColors.primaryText : lightColors.primaryText,
+        drawerLabelStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="MainStack" component={MainStackNavigator} options={{title: 'Menu'}}/>
+      <Drawer.Screen name="MainStack" component={MainStackNavigator} options={{ title: 'Menu' }} />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="About" component={AboutScreen} />
     </Drawer.Navigator>
@@ -75,9 +114,11 @@ function RootDrawerNavigator() {
 export default function App() {
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <RootDrawerNavigator />
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <RootDrawerNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </ThemeProvider>
   );
 }

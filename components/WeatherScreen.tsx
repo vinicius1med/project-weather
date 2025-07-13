@@ -1,19 +1,38 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+  DrawerActions,
+} from '@react-navigation/native';
+import {
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
+import {
+  DrawerNavigationProp,
+} from '@react-navigation/drawer';
 import Footer from './footer/Footer';
-import { StackParamList, DrawerParamList } from '../App';
-import { WeatherData } from '../App';
+import { StackParamList, DrawerParamList, WeatherData } from '../App';
 import { useTheme } from '../components/context/ThemeContext';
+import { darkColors, lightColors } from '../components/ui/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createHistory } from '../components/utils/api';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type WeatherScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
   NativeStackNavigationProp<StackParamList, 'Weather'>
 >;
+
 
 const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
 
@@ -24,6 +43,9 @@ export default function WeatherScreen() {
   const navigation = useNavigation<WeatherScreenNavigationProp>();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [userId, setUserId] = useState<string | null>(null);
+  
+
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -36,6 +58,22 @@ export default function WeatherScreen() {
       if (data.cod === 200) {
         setWeatherData(data);
         setError('');
+
+        const id = await AsyncStorage.getItem('userId');
+        setUserId(id);
+
+        await createHistory(userId, {
+          city: data.name,
+          country: data.sys.country,
+          weatherDescription: data.weather[0].description,
+          weatherIcon: data.weather[0].icon,
+          temperature: data.main.temp,
+          windSpeed: data.wind.speed,
+          lon: data.coord.lon,
+          lat: data.coord.lat,
+          date: new Date().toISOString(),
+        });
+
       } else {
         setError('Cidade não encontrada');
         setWeatherData(null);
@@ -47,50 +85,139 @@ export default function WeatherScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}> 
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? darkColors.background
+            : lightColors.background,
+        },
+      ]}
+      edges={['top', 'bottom']}
+    >
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          {
+            borderColor: isDark ? darkColors.borders : lightColors.borders,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         >
-          <Feather name="align-justify" size={24} color="black" />
+          <Feather
+            name="align-justify"
+            size={24}
+            color={isDark ? darkColors.primaryText : lightColors.primaryText}
+          />
         </TouchableOpacity>
+
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              color: isDark ? darkColors.primaryText : lightColors.primaryText,
+              borderColor: isDark ? darkColors.borders : lightColors.borders,
+            },
+          ]}
           placeholder="Pesquisar cidade"
-          placeholderTextColor="#888"
+          placeholderTextColor={isDark ? '#aaa' : '#888'}
           value={city}
-          onChangeText={(text) => setCity(text)}
+          onChangeText={setCity}
           onSubmitEditing={fetchWeather}
         />
-        <TouchableOpacity style={styles.searchButton} onPress={fetchWeather}>
-          <Text style={styles.searchButtonText}>Buscar</Text>
+
+        <TouchableOpacity
+          style={[
+            styles.searchButton,
+            {
+              backgroundColor: isDark
+                ? darkColors.buttons
+                : lightColors.buttons,
+            },
+          ]}
+          onPress={fetchWeather}
+        >
+          <Text style={[styles.searchButtonText, { color: '#fff' }]}>
+            Buscar
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Weather Data */}
       {weatherData && (
         <View style={styles.weatherContainer}>
-          <Text style={styles.cityName}>{weatherData.name}</Text>
+          <Text
+            style={[
+              styles.cityName,
+              {
+                color: isDark
+                  ? darkColors.primaryText
+                  : lightColors.primaryText,
+              },
+            ]}
+          >
+            {weatherData.name}
+          </Text>
           <Image
             style={styles.weatherIcon}
             source={{
               uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`,
             }}
           />
-          <Text style={styles.temperature}>
+          <Text
+            style={[
+              styles.temperature,
+              {
+                color: isDark
+                  ? darkColors.primaryText
+                  : lightColors.primaryText,
+              },
+            ]}
+          >
             {Math.round(weatherData.main.temp)}°
           </Text>
-          <Text style={styles.description}>
+          <Text
+            style={[
+              styles.description,
+              {
+                color: isDark
+                  ? darkColors.primaryText
+                  : lightColors.primaryText,
+              },
+            ]}
+          >
             {weatherData.weather[0].description}
           </Text>
+
           <View style={styles.additionalInfo}>
-            <Text style={styles.info}>
+            <Text
+              style={[
+                styles.info,
+                {
+                  color: isDark
+                    ? darkColors.primaryText
+                    : lightColors.primaryText,
+                },
+              ]}
+            >
               <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed}{' '}
               km/h
             </Text>
-            <Text style={styles.info}>
+            <Text
+              style={[
+                styles.info,
+                {
+                  color: isDark
+                    ? darkColors.primaryText
+                    : lightColors.primaryText,
+                },
+              ]}
+            >
               <Text style={styles.label}>Umidade:</Text>{' '}
               {weatherData.main.humidity}%
             </Text>
@@ -98,9 +225,16 @@ export default function WeatherScreen() {
         </View>
       )}
 
+      {/* Footer */}
       <Footer
         customButton={{
-          icon: <Feather name="thermometer" size={24} color="black" />,
+          icon: (
+            <Feather
+              name="thermometer"
+              size={24}
+              color={isDark ? darkColors.primaryText : lightColors.primaryText}
+            />
+          ),
           label: '+Detalhes',
           onPress: () => {
             if (weatherData) {
@@ -113,8 +247,10 @@ export default function WeatherScreen() {
       />
 
       {/* Error */}
-      {error !== '' && <Text style={styles.errorText}>{error}</Text>}
-    </View>
+      {error !== '' && (
+        <Text style={[styles.errorText, { color: 'red' }]}>{error}</Text>
+      )}
+    </SafeAreaView>
   );
 }
 
@@ -122,7 +258,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 60,
+    paddingTop: 20,
   },
   header: {
     flexDirection: 'row',
@@ -132,29 +268,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    justifyContent: 'space-around',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 70,
-    width: '100%',
-    backgroundColor: '#ccc',
-  },
-  footerButton: {
-    height: 50,
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footerButtonText: {
-    fontSize: 12,
-    color: 'black',
-    marginTop: 2,
-    fontWeight: 'bold',
   },
   input: {
     flex: 1,
@@ -163,21 +276,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ccc',
   },
   menuButton: {
     padding: 10,
     borderRadius: 10,
-    shadowColor: '#000',
   },
   searchButton: {
-    backgroundColor: '#007AFF',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 10,
   },
   searchButtonText: {
-    color: '#fff',
     fontWeight: 'bold',
   },
   weatherContainer: {
@@ -198,11 +307,9 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
   },
   description: {
     fontSize: 18,
-    color: '#666',
     marginBottom: 10,
     textTransform: 'capitalize',
   },
@@ -213,13 +320,11 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 16,
-    color: '#333',
   },
   label: {
     fontWeight: 'bold',
   },
   errorText: {
-    color: 'red',
     marginTop: 20,
   },
 });
