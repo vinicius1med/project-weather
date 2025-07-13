@@ -8,6 +8,8 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import Footer from './footer/Footer';
 import { StackParamList, DrawerParamList } from '../App';
+import { useTheme } from '../components/context/ThemeContext';
+import { darkColors, lightColors } from '../components/ui/colors';
 
 type SettingsScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
@@ -20,22 +22,25 @@ const DetailsScreen = () => {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
   const route = useRoute<DetailsScreenRouteProp>();
   const { weatherData } = route.params;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const colors = isDark ? darkColors : lightColors;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderColor: colors.borders }]}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         >
-          <Feather name="align-justify" size={24} color="black" />
+          <Feather name="align-justify" size={24} color={colors.primaryText} />
         </TouchableOpacity>
-        <Text style={styles.title}>Detalhes</Text>
+        <Text style={[styles.title, { color: colors.primaryText }]}>Detalhes</Text>
       </View>
 
       <ScrollView style={styles.scroll}>
-        <Text style={styles.cityName}>
+        <Text style={[styles.cityName, { color: colors.primaryText }]}>
           {weatherData.name}, {weatherData.sys.country}
         </Text>
         <Image
@@ -44,36 +49,33 @@ const DetailsScreen = () => {
             uri: `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`,
           }}
         />
-        <Text style={styles.temperature}>
+        <Text style={[styles.temperature, { color: colors.primaryText }]}>
           {Math.round(weatherData.main.temp)}°
         </Text>
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: colors.primaryText }]}>
           {weatherData.weather[0].description}
         </Text>
         <View style={styles.additionalInfo}>
-          <Text style={styles.info}>
-            <Text style={styles.label}>Pressão:</Text>{' '}
-            {weatherData.main.pressure} hPa
+          <Text style={[styles.info, { color: colors.primaryText }]}>
+            <Text style={styles.label}>Pressão:</Text> {weatherData.main.pressure} hPa
           </Text>
-          <Text style={styles.info}>
-            <Text style={styles.label}>Umidade:</Text>{' '}
-            {weatherData.main.humidity}%
+          <Text style={[styles.info, { color: colors.primaryText }]}>
+            <Text style={styles.label}>Umidade:</Text> {weatherData.main.humidity}%
           </Text>
-          <Text style={styles.info}>
-            <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed}{' '}
-            km/h
+          <Text style={[styles.info, { color: colors.primaryText }]}>
+            <Text style={styles.label}>Vento:</Text> {weatherData.wind.speed} km/h
           </Text>
-          <Text style={styles.info}>
+          <Text style={[styles.info, { color: colors.primaryText }]}>
             <Text style={styles.label}>Longitude:</Text> {weatherData.coord.lon}
           </Text>
-          <Text style={styles.info}>
+          <Text style={[styles.info, { color: colors.primaryText }]}>
             <Text style={styles.label}>Latitude:</Text> {weatherData.coord.lat}
           </Text>
-          <Text style={styles.info}>
+          <Text style={[styles.info, { color: colors.primaryText }]}>
             <Text style={styles.label}>Nascer do sol:</Text>{' '}
-            {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}  {/* convertendo para formato de horas 00:00:00 */}
+            {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}
           </Text>
-          <Text style={styles.info}>
+          <Text style={[styles.info, { color: colors.primaryText }]}>
             <Text style={styles.label}>Pôr do sol:</Text>{' '}
             {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}
           </Text>
@@ -82,7 +84,13 @@ const DetailsScreen = () => {
 
       <Footer
         customButton={{
-          icon: <Feather name="cloud" size={24} color="black" />,
+          icon: (
+            <Feather
+              name="cloud"
+              size={24}
+              color={colors.primaryText}
+            />
+          ),
           label: 'Clima',
           onPress: () => navigation.navigate('Weather'),
         }}
@@ -98,7 +106,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 60,
     alignItems: 'center',
-    backgroundColor: '#fff',
     width: '100%',
   },
   header: {
@@ -108,7 +115,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     width: '100%',
   },
   menuButton: {
@@ -122,10 +128,6 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 20,
   },
-  jsonText: {
-    fontSize: 14,
-    fontFamily: 'monospace',
-  },
   cityName: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -138,11 +140,9 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
   },
   description: {
     fontSize: 18,
-    color: '#666',
     marginBottom: 10,
     textTransform: 'capitalize',
   },
@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 16,
-    color: '#333',
     marginBottom: 4,
   },
   label: {

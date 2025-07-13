@@ -1,10 +1,14 @@
-// Para o dark theme
+// config do dark theme
 export const lightColors = {
   background: '#fff',
-  text: '#000',
+  primaryText: '#000',
+  borders: '#ccc',
+  buttons: '#007AFF',
 };
 
 export const darkColors = {
-  background: '#000',
-  text: '#fff',
+  background: '#121212',
+  primaryText: '#eeeeee',
+  borders: '#444444',
+  buttons: '#412485',
 };

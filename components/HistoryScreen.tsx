@@ -1,12 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList,} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Footer from './footer/Footer';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { StackParamList, DrawerParamList } from '../App';  
+import { StackParamList, DrawerParamList } from '../App';
+import { useTheme } from '../components/context/ThemeContext';
+import { darkColors, lightColors } from '../components/ui/colors';
+import { getHistory } from '../components/utils/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SettingsScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
@@ -15,34 +19,56 @@ type SettingsScreenNavigationProp = CompositeNavigationProp<
 
 export default function HistoryScreen() {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
-  const history = ['São Paulo', 'Rio de Janeiro', 'Salvador', 'Fortaleza'];
+  const [history, setHistory] = useState<any[]>([]);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const colors = isDark ? darkColors : lightColors;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const id = await AsyncStorage.getItem('userId');
+        setUserId(id);
+        const data = await getHistory(userId);
+        setHistory(data);
+      } catch (error) {
+        console.error('Erro ao carregar histórico:', error);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderColor: colors.borders }]}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         >
-          <Feather name="align-justify" size={24} color="black" />
+          <Feather name="align-justify" size={24} color={colors.primaryText} />
         </TouchableOpacity>
-        <Text style={styles.title}>Histórico</Text>
+        <Text style={[styles.title, { color: colors.primaryText }]}>
+          Histórico
+        </Text>
       </View>
 
       <FlatList
         data={history}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemText}>{item}</Text>
+          <View style={[styles.item, { borderColor: colors.borders }]}>
+            <Text style={[styles.itemText, { color: colors.primaryText }]}>
+              {item.city} - {item.country}
+            </Text>
           </View>
         )}
       />
 
       <Footer
         customButton={{
-          icon: <Feather name="cloud" size={24} color="black" />,
+          icon: <Feather name="cloud" size={24} color={colors.primaryText} />,
           label: 'Clima',
           onPress: () => navigation.navigate('Weather'),
         }}
@@ -56,18 +82,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 60,
     alignItems: 'center',
-    backgroundColor: '#fff',
     width: '100%',
   },
   header: {
-    width: '100%',  
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
   },
   menuButton: {
     padding: 10,
@@ -79,7 +103,6 @@ const styles = StyleSheet.create({
   item: {
     padding: 15,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     width: '100%',
   },
   itemText: {
