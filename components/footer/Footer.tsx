@@ -5,13 +5,10 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { darkColors, lightColors } from '../ui/colors';
+import { DrawerParamList } from '../../App';
 
-type RootStackParamList = {
-  History: undefined;
-  Details: undefined;
-  Calendar: undefined;
-  Settings: undefined;
-};
+type RootNavigatorParamList = DrawerParamList;
+type FooterNavigationProp = NavigationProp<RootNavigatorParamList>;
 
 type FooterButton = {
   icon: React.ReactNode;
@@ -24,7 +21,7 @@ type FooterProps = {
 };
 
 export default function Footer({ customButton }: FooterProps) {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<FooterNavigationProp>();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -49,7 +46,7 @@ export default function Footer({ customButton }: FooterProps) {
         onPress={
           customButton
             ? customButton.onPress
-            : () => alert('Sem função definida neste botão')
+            : () => navigation.navigate('MainStack', { screen: 'Details' })
         }
       >
         {customButton ? (
@@ -71,7 +68,7 @@ export default function Footer({ customButton }: FooterProps) {
 
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={() => navigation.navigate('History')}
+        onPress={() => navigation.navigate('MainStack', { screen: 'History' })}
       >
         <Feather name="clock" size={24} color={iconColor} />
         <Text style={[styles.footerButtonText, { color: iconColor }]}>Histórico</Text>
@@ -79,7 +76,7 @@ export default function Footer({ customButton }: FooterProps) {
 
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={() => navigation.navigate('Calendar')}
+        onPress={() => navigation.navigate('MainStack', { screen: 'Calendar' })}
       >
         <Feather name="calendar" size={24} color={iconColor} />
         <Text style={[styles.footerButtonText, { color: iconColor }]}>Calendário</Text>
@@ -87,7 +84,7 @@ export default function Footer({ customButton }: FooterProps) {
 
       <TouchableOpacity
         style={styles.footerButton}
-        onPress={() => navigation.navigate('Settings')}
+        onPress={() => navigation.navigate('MainStack', { screen: 'Settings' })}
       >
         <Feather name="settings" size={24} color={iconColor} />
         <Text style={[styles.footerButtonText, { color: iconColor }]}>Ajustes</Text>
