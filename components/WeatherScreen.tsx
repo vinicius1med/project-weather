@@ -25,16 +25,15 @@ import { useTheme } from '../components/context/ThemeContext';
 import { darkColors, lightColors } from '../components/ui/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createHistory } from '../components/utils/api';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 type WeatherScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
   NativeStackNavigationProp<StackParamList, 'Weather'>
 >;
 
-
-const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
+const API_KEY = Constants.expoConfig?.extra?.OPENWEATHER_API_KEY;
 
 export default function WeatherScreen() {
   const [city, setCity] = useState<string>('');
