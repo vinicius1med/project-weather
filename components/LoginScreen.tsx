@@ -1,17 +1,19 @@
+import React, { useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-import { useState } from 'react';
-import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { loginUser } from '../components/utils/api';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   StackParamList,
@@ -27,21 +29,16 @@ export default function LoginScreen() {
   async function handleLoginPress() {
     if (nome !== '' && pass !== '') {
       try {
-        const response = await axios.post(
-          'https://weatheruser-production.up.railway.app/users/login',
-          {
-            name: nome,
-            password: pass,
-          }
-        );
+        const response = await loginUser(nome, pass);
 
-        if (response.status === 200) {
+        if (response && response.id) {
+          await AsyncStorage.setItem('userId', String(response.id));
+          await AsyncStorage.setItem('userName', response.name);
+
           setNome('');
           setPass('');
           setMessage('');
           navigation.navigate('Weather');
-          await AsyncStorage.setItem('userId', String(response.data.id));
-          await AsyncStorage.setItem('userName', response.data.name);
         } else {
           setMessage('Nome ou senha incorretos.');
         }
@@ -59,51 +56,61 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.container}>
-        <Text style={styles.top}>Login</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={styles.screen}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <Text style={styles.top}>Login</Text>
 
-        <View style={styles.box}>
-          <Text style={styles.label}>Nome</Text>
-          <TextInput
-            style={styles.input}
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Digite seu nome"
-            placeholderTextColor="#999"
-          />
+          <View style={styles.box}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.box}>
+            <Text style={styles.label}>Senha</Text>
+            <TextInput
+              style={styles.input}
+              value={pass}
+              onChangeText={setPass}
+              placeholder="Digite sua senha"
+              placeholderTextColor="#999"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Register')}
+            style={styles.linkContainer}
+          >
+            <Text style={styles.linkText}>Criar conta</Text>
+          </TouchableOpacity>
+
+          {message !== '' && <Text style={styles.messageText}>{message}</Text>}
+
+          <TouchableOpacity
+            style={styles.appButtonContainer}
+            activeOpacity={0.8}
+            onPress={handleLoginPress}
+          >
+            <Text style={styles.appButtonText}>Entrar</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.box}>
-          <Text style={styles.label}>Senha</Text>
-          <TextInput
-            style={styles.input}
-            value={pass}
-            onChangeText={setPass}
-            placeholder="Digite sua senha"
-            placeholderTextColor="#999"
-            secureTextEntry={true}
-          />
-        </View>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Register')}
-          style={styles.linkContainer}
-        >
-          <Text style={styles.linkText}>Criar conta</Text>
-        </TouchableOpacity>
-
-        {message !== '' && <Text style={styles.messageText}>{message}</Text>}
-
-        <TouchableOpacity
-          style={styles.appButtonContainer}
-          activeOpacity={0.8}
-          onPress={handleLoginPress}
-        >
-          <Text style={styles.appButtonText}>Entrar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -120,7 +127,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   screen: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#FFF',
     justifyContent: 'center',
     padding: 16,

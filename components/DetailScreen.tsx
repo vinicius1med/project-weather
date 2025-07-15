@@ -1,25 +1,41 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+} from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+  DrawerActions,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import {
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
+import {
+  DrawerNavigationProp,
+} from '@react-navigation/drawer';
 import Footer from './footer/Footer';
 import { StackParamList, DrawerParamList } from '../App';
 import { useTheme } from '../components/context/ThemeContext';
 import { darkColors, lightColors } from '../components/ui/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-type SettingsScreenNavigationProp = CompositeNavigationProp<
+type DetailsScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'MainStack'>,
   NativeStackNavigationProp<StackParamList, 'Details'>
 >;
 
 type DetailsScreenRouteProp = RouteProp<StackParamList, 'Details'>;
 
-const DetailsScreen = () => {
-  const navigation = useNavigation<SettingsScreenNavigationProp>();
+export default function DetailsScreen() {
+  const navigation = useNavigation<DetailsScreenNavigationProp>();
   const route = useRoute<DetailsScreenRouteProp>();
   const { weatherData } = route.params;
   const { theme } = useTheme();
@@ -27,8 +43,10 @@ const DetailsScreen = () => {
   const colors = isDark ? darkColors : lightColors;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={['top', 'bottom']}
+    >
       <View style={[styles.header, { borderColor: colors.borders }]}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -36,7 +54,9 @@ const DetailsScreen = () => {
         >
           <Feather name="align-justify" size={24} color={colors.primaryText} />
         </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.primaryText }]}>Detalhes</Text>
+        <Text style={[styles.title, { color: colors.primaryText }]}>
+          Detalhes
+        </Text>
       </View>
 
       <ScrollView style={styles.scroll}>
@@ -84,27 +104,19 @@ const DetailsScreen = () => {
 
       <Footer
         customButton={{
-          icon: (
-            <Feather
-              name="cloud"
-              size={24}
-              color={colors.primaryText}
-            />
-          ),
+          icon: <Feather name="cloud" size={24} color={colors.primaryText} />,
           label: 'Clima',
           onPress: () => navigation.navigate('Weather'),
         }}
       />
-    </View>
+    </SafeAreaView>
   );
-};
-
-export default DetailsScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 20,
     alignItems: 'center',
     width: '100%',
   },

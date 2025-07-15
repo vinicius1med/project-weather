@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
@@ -15,6 +16,9 @@ import AboutScreen from './components/AboutScreen';
 import { ThemeProvider, useTheme } from './components/context/ThemeContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { darkColors, lightColors } from './components/ui/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, CommonActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export type WeatherData = {
   name: string;
@@ -27,7 +31,7 @@ export type WeatherData = {
 };
 
 export type DrawerParamList = {
-  MainStack: undefined;
+  MainStack: { screen: keyof StackParamList } | undefined;
   Profile: undefined;
   About: undefined;
 };
@@ -68,18 +72,64 @@ function CustomDrawerContent(props: any) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Confirmar logout',
+      'Tem certeza que deseja sair da conta?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('userId');
+              await AsyncStorage.removeItem('userName');
+
+              props.navigation.closeDrawer();
+
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                })
+              );
+            } catch (error) {
+              console.error('Erro ao fazer logout:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <DrawerContentScrollView
       {...props}
       style={{ backgroundColor: isDark ? darkColors.background : lightColors.background }}
       contentContainerStyle={{ flex: 1 }}
     >
-      <DrawerItemList {...props} 
+      <DrawerItemList
+        {...props}
         labelStyle={{ color: isDark ? darkColors.primaryText : lightColors.primaryText }}
         activeTintColor={isDark ? darkColors.buttons : lightColors.buttons}
         inactiveTintColor={isDark ? darkColors.primaryText : lightColors.primaryText}
       />
-      {/* Você pode adicionar itens customizados aqui, se quiser */}
+
+      <DrawerItem
+        label="Logout"
+        labelStyle={{
+          color: 'red',
+          fontWeight: 'bold',
+        }}
+        onPress={handleLogout}
+      />
     </DrawerContentScrollView>
   );
 }

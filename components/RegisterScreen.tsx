@@ -1,15 +1,18 @@
+import React, { useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-import { useState } from 'react';
-import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../App';
+import { registerUser } from '../components/utils/api';
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   StackParamList,
@@ -26,29 +29,23 @@ export default function RegisterScreen() {
   async function handleRegisterPress() {
     if (nome !== '' && pass !== '') {
       try {
-        const response = await axios.post(
-          'https://weatheruser-production.up.railway.app/users',
-          {
-            name: nome,
-            password: pass,
-          }
-        );
+        const response = await registerUser(nome, pass);
 
-        if (response.status === 200) {
+        if (response && response.id) {
           setNome('');
           setPass('');
           setMessage('Cadastro realizado com sucesso!');
+          setIsSuccess(true);
+
           setTimeout(() => {
             navigation.navigate('Login');
           }, 1500);
-          setIsSuccess(true);
         } else {
           setMessage('Erro ao cadastrar usuário.');
           setIsSuccess(false);
         }
       } catch (error: any) {
         if (error.response && error.response.status === 409) {
-          // Supondo que sua API retorne 409 se usuário já existir
           setMessage('Usuário já existe.');
           setIsSuccess(false);
         } else {
@@ -64,59 +61,69 @@ export default function RegisterScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.container}>
-        <Text style={styles.top}>Cadastro</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={styles.screen}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <Text style={styles.top}>Cadastro</Text>
 
-        <View style={styles.box}>
-          <Text style={styles.label}>Nome</Text>
-          <TextInput
-            style={styles.input}
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Digite seu nome"
-            placeholderTextColor="#999"
-          />
+          <View style={styles.box}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#999"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.box}>
+            <Text style={styles.label}>Senha</Text>
+            <TextInput
+              style={styles.input}
+              value={pass}
+              onChangeText={setPass}
+              placeholder="Digite sua senha"
+              placeholderTextColor="#999"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <Text
+            style={[styles.messageText, { color: isSuccess ? 'green' : 'red' }]}
+          >
+            {message}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.appButtonContainer}
+            activeOpacity={0.8}
+            onPress={handleRegisterPress}
+          >
+            <Text style={styles.appButtonText}>Registrar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.appButtonContainer,
+              { marginTop: 10, backgroundColor: '#555' },
+            ]}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.appButtonText}>Voltar para Login</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.box}>
-          <Text style={styles.label}>Senha</Text>
-          <TextInput
-            style={styles.input}
-            value={pass}
-            onChangeText={setPass}
-            placeholder="Digite sua senha"
-            placeholderTextColor="#999"
-            secureTextEntry={true}
-          />
-        </View>
-
-        <Text
-          style={[styles.messageText, { color: isSuccess ? 'green' : 'red' }]}
-        >
-          {message}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.appButtonContainer}
-          activeOpacity={0.8}
-          onPress={handleRegisterPress}
-        >
-          <Text style={styles.appButtonText}>Registrar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.appButtonContainer,
-            { marginTop: 10, backgroundColor: '#555' },
-          ]}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.appButtonText}>Voltar para Login</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -133,7 +140,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   screen: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#FFF',
     justifyContent: 'center',
     padding: 16,

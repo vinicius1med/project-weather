@@ -43,9 +43,6 @@ export default function WeatherScreen() {
   const navigation = useNavigation<WeatherScreenNavigationProp>();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const [userId, setUserId] = useState<string | null>(null);
-  
-
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -59,8 +56,7 @@ export default function WeatherScreen() {
         setWeatherData(data);
         setError('');
 
-        const id = await AsyncStorage.getItem('userId');
-        setUserId(id);
+        const userId = await AsyncStorage.getItem('userId');
 
         await createHistory(userId, {
           city: data.name,
@@ -96,7 +92,6 @@ export default function WeatherScreen() {
       ]}
       edges={['top', 'bottom']}
     >
-      {/* Header */}
       <View
         style={[
           styles.header,
@@ -148,7 +143,6 @@ export default function WeatherScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Weather Data */}
       {weatherData && (
         <View style={styles.weatherContainer}>
           <Text
@@ -225,7 +219,6 @@ export default function WeatherScreen() {
         </View>
       )}
 
-      {/* Footer */}
       <Footer
         customButton={{
           icon: (
@@ -246,7 +239,6 @@ export default function WeatherScreen() {
         }}
       />
 
-      {/* Error */}
       {error !== '' && (
         <Text style={[styles.errorText, { color: 'red' }]}>{error}</Text>
       )}
