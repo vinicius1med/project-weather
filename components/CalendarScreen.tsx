@@ -18,6 +18,7 @@ import { DrawerActions } from '@react-navigation/native';
 import { useTheme } from '../components/context/ThemeContext';
 import { darkColors, lightColors } from '../components/ui/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 type RootStackParamList = {
   Weather: undefined;
@@ -32,7 +33,7 @@ type WeatherData = {
   humidity: number;
 };
 
-const API_KEY = '6971acb58fdbe71863cbeabfcba1eb96';
+const API_KEY = Constants.expoConfig?.extra?.OPENWEATHER_API_KEY;
 
 export default function CalendarScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
